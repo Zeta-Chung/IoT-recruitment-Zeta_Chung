@@ -163,7 +163,26 @@ void loop() {
 
 * 只有接收到开始信号后才触发温湿度采集。
 
+* 电路连接
+  * VCC引脚接开发板的3.3V引脚用于供电（不能用5V供电）。
+
+  * GND引脚接开发板的GND引脚。
+
+  * DATA引脚接开发板GPIO引脚，用于信号接收。
+  
+
 #### 相关代码
-* **头文件```dht11.h```**
-* ```dht.readHumidity()```：读取湿度
-* ```dht.readTEmperature()```:读取设备温度
+* **头文件```DHT11.h```**
+* ```DHT11 dht11(pinmode)```：设置传感器名称为dht11,设置输出串口。
+
+* ```dht11.readHumidity()```：读取湿度。
+* ```dht11.readTemperature()```：读取温度。
+* ```dht11.readTemperatureHumidity(temperature, humidity)```：同时读取温湿度，返回值类型为**int**。
+
+## 实现过程
+1. 准备DHT11传感器
+2. 在Arduino中安装DHT11库
+
+3. 学习BlinkwithoutDelay与DHT11的示例
+4. 在一轮原代码的基础上优化，添加DHT11与非阻滞相关功能
+5. 连接电路，上传程序，实现三线程并发。
