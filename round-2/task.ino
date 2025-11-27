@@ -3,23 +3,21 @@
 #include<DHT11.h> 
 #include<HTTPClient.h>
 
-DHT11 dht11(2);//声明传感器，设置引脚为GPIO2
+DHT11 dht11(2);
 
 const char * ssid = "XXX";
 const char * password = "XXX";
 
-WebServer server(80);//声明服务器
+WebServer server(80);
 
-const int led = 4;//设置LED引脚为GPIO4
+const int led = 4;//设置引脚为GPIO4
 
-//设置读取和打印温湿度的时间间隔，设置起始时间
 const unsigned long interval_re = 2000;
 const unsigned long interval_wr = 5000;
 unsigned long previoustime_dhtread = 0;
 unsigned long previoustime_dhtwrite = 0;
-//初始化温湿度
 int temp,humid;
-//设置上传数据的时间间隔，设置起始时间
+
 const unsigned long interval_http = 30000;
 unsigned long previoustime_http = 0;
 
@@ -28,6 +26,7 @@ void handleroot()//配置网页
   String html = "<html><body><h1>Control the LED!</h1>";
   html += "<p><a href = \"/on\"><button>ON</button></a></p>";
   html += "<p><a href = \"/off\"><button>OFF</button></a></p>";
+  html += "<p><a href = \"/json\"><button>Status</button></a></p>";
   html += "</body></html>";
   server.send(200,"text/html",html);
 }
@@ -44,13 +43,22 @@ void ledoff()//关灯
   server.send(200,"The LED is OFF");
 }
 
-/*void json()//配置json
+void json()
 { 
+  int pinmode = digitalRead(4);
+  String ledstate;
+  if(pinmode == HIGH)
+  {ledstate = "\"ON\"";}
+  else
+  {ledstate = "\"OFF\"";}
 
-  server.send(200,)
+  String json = "{";
+  json += "\"温度\":" + String(temp) + "°C,";
+  json += "\"湿度\":" + String(humid) + "%,";
+  json += "\"pinmode\":" + ledstate + "}";
+  server.send(200,"application/json",json);
 }
-*/
-void Webprocess()//配置服务器
+void Webprocess()
 {
   server.on("/",handleroot);//路径与函数建立关联
   server.on("/on",ledon);
@@ -60,7 +68,7 @@ void Webprocess()//配置服务器
   server.begin();//启动服务器
 }
 
-void Wifiprocess()//配置WiFi
+void Wifiprocess()
 {
   WiFi.begin(ssid,password);
 
@@ -75,7 +83,6 @@ void Wifiprocess()//配置WiFi
   Serial.println(WiFi.localIP());//打印出IP地址
 }
 
-//设置HTTP服务器
 void httpprocess(int temp,int humid)
 { 
   String url = "https://api.thingspeak.com/update?api_key=3ABCV0OOLV6W54UF";
@@ -86,7 +93,6 @@ void httpprocess(int temp,int humid)
   http.GET();
   http.end();
 }
-
 void setup() {
   pinMode(led,OUTPUT);
   Serial.begin(115200);  
@@ -98,12 +104,12 @@ void loop() {
   server.handleClient();//ESP32服务器持续处理请求
   unsigned long currenttime = millis();
 
-  if(currenttime-previoustime_dhtread >= interval_re)//2秒收集一次数据
+  if(currenttime-previoustime_dhtread >= interval_re)
   {
     dht11.readTemperatureHumidity(temp,humid);
     previoustime_dhtread = currenttime;
   }
-  if(currenttime-previoustime_dhtwrite >= interval_wr)//5秒打印一次数据
+  if(currenttime-previoustime_dhtwrite >= interval_wr)
   {
     Serial.print("humidity:");
     Serial.print(humid);
@@ -113,7 +119,7 @@ void loop() {
     Serial.println("°C");
     previoustime_dhtwrite = currenttime;
   }
-  if(currenttime-previoustime_http >= interval_http)//30秒上传一次数据
+  if(currenttime-previoustime_http >= interval_http)
   {
     httpprocess(temp,humid);
     previoustime_http = currenttime;
