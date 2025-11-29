@@ -12,8 +12,8 @@ WebServer server(80);
 
 const int led = 4;//设置引脚为GPIO4
 
-const unsigned long interval_re = 2000;
-const unsigned long interval_wr = 5000;
+const unsigned long interval_re = 2000;//读取数据的时间间隔
+const unsigned long interval_wr = 5000;//打印数据的时间间隔
 unsigned long previoustime_dhtread = 0;
 unsigned long previoustime_dhtwrite = 0;
 int temp,humid;
