@@ -245,4 +245,4 @@ void loop() {
 ## 附github仓库链接
 https://github.com/Zeta-Chung/IoT-recruitment-Zeta_Chung
 ## 附Thingspeak链接
-https://thingspeak.mathworks.com/channels/3172760/private_show
+https://thingspeak.mathworks.com/channels/3172760
